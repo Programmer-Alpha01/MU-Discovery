@@ -25,74 +25,109 @@ export function createDensityBar(fillCount, isDisabled = false) {
     return bar;
 }
 
+// js/shared.js  ── replace the renderBlock function with this ──
 export function renderBlock(container, block, currentIndex, totalBlocks) {
-    container.innerHTML = '';
+    container.innerHTML = ''; 
 
-    const blockDiv = document.createElement('div');
-    blockDiv.className = 'block';
-    blockDiv.innerHTML = `<h2>${block.name}</h2>`;
+    const title = document.createElement('h2');
+    title.textContent = block.name;
+    container.appendChild(title);
 
-    const grid = document.createElement('div');
-    grid.className = 'floors-grid';
+    const floorWrapper = document.createElement('div');
+    floorWrapper.className = 'floor-wrapper';
 
-    for (let f = 1; f <= block.floors; f++) {
-        const isDisabled = block.disabledFloors.includes(f);
-        const density = isDisabled ? 0 : (block.densities[f-1] || 0);
-
-        const item = document.createElement('div');
-        item.className = 'floor-item' + (isDisabled ? ' disabled' : '');
-
-        // Label
-        const label = document.createElement('div');
-        label.className = 'floor-label';
-
-        const floorNum = f;
-        const customName = block.floorNames[floorNum - 1];
-
-        if (customName) {
-            label.textContent = customName;
-            if (customName === "-1F" || customName.toLowerCase().includes("b")) {
-                label.classList.add('basement');
-            } else if (customName.toLowerCase().includes("roof")) {
-                label.classList.add('rooftop');
-            }
-        } else {
-            label.textContent = `Floor ${floorNum}`;
+    for (let i = 0; i < block.floors; i++) {
+        const floorDiv = document.createElement('div');
+        
+        floorDiv.className = 'floor-module';
+        if (block.disabledFloors.includes(i)) {
+            floorDiv.classList.add('disabled');
         }
 
-        item.appendChild(label);
+        const floorLabel = document.createElement('div');
+        floorLabel.className = 'floor-label';
+        floorLabel.textContent = block.floorNames[i] || `Floor ${i}`;
+        floorDiv.appendChild(floorLabel);
 
-// inside the for loop in renderBlock()
-
-        if (isDisabled) {
-            const reason = block.disabledReasons?.[floorNum] || "Disabled";
-            
-            const status = document.createElement('div');
-            status.className = 'floor-status';
-            status.textContent = reason;                    // ← changed
-            // Optional: make it tooltip or smaller font if reasons are long
-            // status.title = reason;   // hover shows full text
-            item.appendChild(status);
+        let densityBar;
+        if (block.disabledFloors.includes(i)) {
+            densityBar = createDensityBar(0, true);
+            const reason = document.createElement('div');
+            reason.className = 'floor-info';
+            reason.textContent = block.disabledReasons[i] || 'Disabled';
+            floorDiv.appendChild(densityBar);
+            floorDiv.appendChild(reason);
         } else {
-            const bar = createDensityBar(density);
-            item.appendChild(bar);
+            const density = block.densities[i] || 0;
+            densityBar = createDensityBar(density);
+
+            const densityText = document.createElement('div');
+            densityText.className = 'floor-number';
+            densityText.textContent = `Density: ${density}/10`;
+            floorDiv.appendChild(densityBar);
+            floorDiv.appendChild(densityText);
         }
 
-        // Spacer for consistent height
-        const spacer = document.createElement('div');
-        spacer.style.height = '22px';
-        spacer.style.visibility = isDisabled ? 'visible' : 'hidden';
-        item.appendChild(spacer);
+        // ── Always make it clickable ──
+        floorDiv.style.cursor = 'pointer';
+        floorDiv.classList.add('clickable-floor'); // for hover style if you have CSS
 
-        grid.appendChild(item);
+        floorDiv.addEventListener('click', () => {
+            showFloorDetailPanel(block, i);
+        });
+
+        floorWrapper.appendChild(floorDiv);
     }
 
-    blockDiv.appendChild(grid);
-    container.appendChild(blockDiv);
+    container.appendChild(floorWrapper);
+}
 
-    // Update navigation buttons
-    document.getElementById('prevBtn').disabled = currentIndex === 0;
-    document.getElementById('nextBtn').disabled = currentIndex >= totalBlocks - 1;
+// ────────────────────── New side panel implementation ──────────────────────
+
+export function showFloorDetailPanel(block, floorIndex) {
+    document.querySelectorAll('.floor-detail-panel').forEach(el => el.remove());
+
+    const floorName = block.floorNames?.[floorIndex] || `Floor ${floorIndex}`;
+    const isDisabled = block.disabledFloors.includes(floorIndex);
+    const density = isDisabled ? 0 : (block.densities?.[floorIndex] ?? 0);
+
+    const panel = document.createElement('div');
+    panel.className = 'floor-detail-panel';
+
+    panel.innerHTML = `
+        <div class="panel-header">
+            <h3>${block.name} — ${floorName}</h3>
+            <button class="close-panel-btn">×</button>
+        </div>
+        <div class="panel-body">
+            ${isDisabled 
+                ? `
+                <div class="status disabled">
+                    <strong>Closed / Restricted</strong><br>
+                    ${block.disabledReasons?.[floorIndex] || 'No reason provided'}
+                </div>
+                `
+                : `
+                <div class="status density">
+                    Current density: <strong>${density}/10</strong>
+                </div>
+                <div class="detail-content">
+                    Description: ${block.floorDetails?.[floorIndex] ? block.floorDetails[floorIndex].replace(/\n/g, '<br>')
+                    : '<em>No specific information available for this floor.</em>'}
+                </div>
+                `}
+        </div>
+    `;
+
+    // Slide in animation
+    document.body.appendChild(panel);
+    panel.offsetHeight; // force reflow
+    setTimeout(() => panel.classList.add('show'), 20);
+
+    const closeBtn = panel.querySelector('.close-panel-btn');
+    closeBtn.onclick = () => panel.remove();
+    panel.onclick = (e) => { if (e.target === panel) panel.remove(); };
+    closeBtn.focus();
 }
 
 export function initLastUpdated() {

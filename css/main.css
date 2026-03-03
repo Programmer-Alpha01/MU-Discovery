@@ -12,6 +12,7 @@ body {
   min-height: 100vh;
 }
 
+/* ── Navigation ── */
 nav {
   width: 220px;
   background: linear-gradient(180deg, #2c3e50, #1a2634);
@@ -55,6 +56,7 @@ nav a.active {
   color: white;
 }
 
+/* ── Main Content ── */
 .main-content {
   flex: 1;
   padding: 24px 32px;
@@ -92,6 +94,7 @@ h1 {
   margin-left: 14px;
 }
 
+/* ── Block & Floor Layout ── */
 .block {
   background: white;
   border-radius: 12px;
@@ -113,28 +116,30 @@ h1 {
   align-content: start;
 }
 
-.floor-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.98em;
-  min-height: 80px;
-  justify-content: flex-start;
-  padding: 8px;
-  border-radius: 6px;
-  background: white;
+.floor-module {
+  padding: 12px;
+  margin: 6px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  transition: all 0.15s;
+  position: relative;
+  cursor: pointer;          /* always clickable */
 }
 
-.floor-item.disabled {
+.floor-module:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.floor-module.disabled {
   opacity: 0.65;
   background: #f8f9fa;
   border: 1px dashed #bdc3c7;
-  min-height: 80px;
 }
 
 .floor-label {
-  font-weight: 600;
-  color: #2d3436;
+  font-weight: bold;
+  margin-bottom: 6px;
   min-height: 24px;
 }
 
@@ -148,26 +153,29 @@ h1 {
   font-weight: bold;
 }
 
-.floor-status {
+.floor-info {
   font-size: 0.85em;
-  color: #7f8c8d;
-  font-weight: 500;
+  color: #555;
   margin-top: 4px;
 }
 
 .density-bar {
-  height: 22px;
-  background: #ebedef;
-  border-radius: 5px;
-  overflow: hidden;
   display: flex;
+  gap: 2px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f0f0f0;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .segment {
   flex: 1;
+  border-radius: 3px;
 }
 
+/* ── Controls (Prev/Next) ── */
 .controls {
   display: flex;
   justify-content: center;
@@ -197,7 +205,7 @@ h1 {
   cursor: not-allowed;
 }
 
-/* Modal */
+/* ── Info Modal ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -228,4 +236,93 @@ h1 {
 
 .close-btn:hover {
   background: #c0392b;
+}
+
+/* ── Side Detail Panel ── */
+.floor-detail-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  max-width: 90%;
+  height: 100%;
+  background: white;
+  box-shadow: -6px 0 25px rgba(0,0,0,0.28);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.floor-detail-panel.show {
+  transform: translateX(0);
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.close-panel-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+}
+
+.panel-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.status {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+.status.density {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status.disabled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.detail-content {
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+/* ── Clickable floor hover ── */
+.floor-module.clickable-floor:hover,
+.floor-module:hover {
+  background: #f5f7fa;
+  transition: background 0.15s;
+}
+
+.floor-detail-panel {
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.floor-detail-panel.show {
+  transform: translateX(0);
 }

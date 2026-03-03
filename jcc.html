@@ -50,33 +50,43 @@
 
     <script type="module">
         import { campusData } from './js/all-buildings-data.js';
-        import { renderBlock, initLastUpdated, initModal } from './js/shared.js';
+        import { renderBlock, showFloorDetailPanel, initLastUpdated, initModal } from './js/shared.js';
 
-        const blocksData = campusData.jcc;
+        const blocksData = campusData.jcc;  // ← change to .jcc or .ioh on other pages
         let currentIndex = 0;
         const container = document.getElementById('blockContainer');
 
-        function renderCurrent() {
-            renderBlock(container, blocksData[currentIndex], currentIndex, blocksData.length);
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateButtonStates() {
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === blocksData.length - 1;
         }
 
-        document.getElementById('prevBtn').onclick = () => {
+        function renderCurrent() {
+            renderBlock(container, blocksData[currentIndex], currentIndex, blocksData.length);
+            updateButtonStates();
+        }
+
+        prevBtn.onclick = () => {
             if (currentIndex > 0) {
                 currentIndex--;
                 renderCurrent();
             }
         };
 
-        document.getElementById('nextBtn').onclick = () => {
+        nextBtn.onclick = () => {
             if (currentIndex < blocksData.length - 1) {
                 currentIndex++;
                 renderCurrent();
             }
         };
 
+        // Initial render + button states
         initLastUpdated();
         initModal();
-        renderCurrent();
+        renderCurrent();          // this calls updateButtonStates()
     </script>
 </body>
 </html>
