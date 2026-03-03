@@ -83,7 +83,6 @@ export function renderBlock(container, block, currentIndex, totalBlocks) {
 }
 
 // ────────────────────── New side panel implementation ──────────────────────
-
 export function showFloorDetailPanel(block, floorIndex) {
     document.querySelectorAll('.floor-detail-panel').forEach(el => el.remove());
 
@@ -111,15 +110,19 @@ export function showFloorDetailPanel(block, floorIndex) {
                 <div class="status density">
                     Current density: <strong>${density}/10</strong>
                 </div>
+                <div class="Description">
+                    Description: </strong>
+                </div>  
                 <div class="detail-content">
-                    Description: ${block.floorDetails?.[floorIndex] ? block.floorDetails[floorIndex].replace(/\n/g, '<br>')
-                    : '<em>No specific information available for this floor.</em>'}
+${block.floorDetails?.[floorIndex] 
+    ? block.floorDetails[floorIndex].replace(/\n/g, '<br>')
+    : '<em>No specific information available for this floor.</em>'}
                 </div>
                 `}
         </div>
     `;
 
-    // Slide in animation
+    // Slide-in animation
     document.body.appendChild(panel);
     panel.offsetHeight; // force reflow
     setTimeout(() => panel.classList.add('show'), 20);
